@@ -14,3 +14,5 @@ val Orange = Color(0xFFFE9500)
 val Pink = Color(0xFFFFC0CB)
 val Purple = Color(0xFFA020F0)
 val DarkOrange = Color(0xFFFF3F2C)
+val DarkBlue = Color(0xFF2A2E43);
+val LightBlue = Color(0xFF019AE8);
