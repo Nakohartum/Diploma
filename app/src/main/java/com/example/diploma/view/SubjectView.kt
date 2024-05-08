@@ -270,6 +270,9 @@ fun SubjectView(
                                 targetViewModel.updateTarget(
                                     targetData
                                 )
+                                if (it){
+                                    Utils.cancelDeadlineReminder(context, targetData.targetId.toInt())
+                                }
                             }
                         }
 
@@ -394,7 +397,6 @@ fun DatePicker(onDateSelected: (Long) -> Unit){
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
-
         datePickerDialog.show()
 }
 
