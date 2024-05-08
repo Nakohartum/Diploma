@@ -73,6 +73,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.example.diploma.MainActivity
 import com.example.diploma.R
+import com.example.diploma.models.DaysOfTheWeek
 import com.example.diploma.models.Screens
 import com.example.diploma.models.SubjectData
 import com.example.diploma.models.TeacherData
@@ -215,6 +216,14 @@ fun SubjectAdd(
         mutableStateOf(false)
     }
 
+    var dayChoose by remember {
+        mutableStateOf(false)
+    }
+
+    var chosenDay by remember {
+        mutableStateOf<DaysOfTheWeek?>(null)
+    }
+
     var chosenTeacher by remember {
         mutableStateOf<TeacherData?>(null)
     }
@@ -263,36 +272,54 @@ fun SubjectAdd(
                     value = subjectViewModel.subjectDescription,
                     onValueChange = {subjectViewModel.onSubjectDescriptionChanged(it)}
                 )
-                Button(onClick = {
-                    teacherChoose = true
-                }) {
-                    Text(text = if (chosenTeacher != null) chosenTeacher!!.teacherName else "Choose teacher")
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    DropdownMenu(expanded = teacherChoose, onDismissRequest = {
-                        teacherChoose = false
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Button(onClick = {
+                        teacherChoose = true
                     }) {
-                        teacherList.forEach{
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = it.teacherName)
-                                },
-                                onClick = {
-                                    chosenTeacher = it
-                                    subjectViewModel.onTeacherIdChanged(it.teacherId)
-                                    teacherChoose = false
-                                })
+                        Text(text = if (chosenTeacher != null) chosenTeacher!!.teacherName else "Choose teacher")
+                        DropdownMenu(expanded = teacherChoose, onDismissRequest = {
+                            teacherChoose = false
+                        }) {
+                            teacherList.forEach{
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = it.teacherName)
+                                    },
+                                    onClick = {
+                                        chosenTeacher = it
+                                        subjectViewModel.onTeacherIdChanged(it.teacherId)
+                                        teacherChoose = false
+                                    })
+                            }
                         }
                     }
-                    ImagePicker(onImagePicked = {
-                        val imageData = Utils.uriToByteArray(context, it)
-                        subjectViewModel.onSubjectIconChanged(imageData!!)
-                    })
+
+
+                    Button(onClick = { dayChoose = true }) {
+                        Text(text = if(chosenDay != null) chosenDay!!.dayName else "Select day")
+                        DropdownMenu(expanded = dayChoose, onDismissRequest = {
+                            dayChoose = false
+                        }) {
+
+                            DaysOfTheWeek.entries.forEach{
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = it.dayName)
+                                    },
+                                    onClick = {
+                                        chosenDay = it
+                                        subjectViewModel.onDayOfWeekChanged(it.id)
+                                        dayChoose = false
+                                    })
+                            }
+                        }
+                    }
                 }
-                
-                
+
+                ImagePicker(onImagePicked = {
+                    val imageData = Utils.uriToByteArray(context, it)
+                    subjectViewModel.onSubjectIconChanged(imageData!!)
+                })
             }
         }
     )

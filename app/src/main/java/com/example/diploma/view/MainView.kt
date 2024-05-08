@@ -105,9 +105,13 @@ fun Navigation(
             )
         }
         
-//        composable(route = Screens.scheduleScreen.route){
-//            ScheduleView(navController = navController,daysOfWeek = stubObject.daysOfTheWeek)
-//        }
+        composable(route = Screens.scheduleScreen.route){
+            ScheduleView(
+                navController = navController,
+                teacherViewModel = teacherViewModel,
+                subjectViewModel = subjectViewModel
+            )
+        }
 
         composable(route = "${Screens.subjectScreen.route}/{subjectId}"){ backStackEntry ->
             val subjectId = backStackEntry.arguments?.getString("subjectId")

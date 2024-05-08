@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.diploma.models.SubjectData
+import com.example.diploma.models.TargetData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -18,11 +19,13 @@ import kotlinx.coroutines.launch
 class SubjectViewModel(
     private val appRepository: AppRepository = Graph.appRepository
 ): ViewModel() {
+    private val _schedule = MutableLiveData<List<SubjectData>>()
     var subjectName by mutableStateOf("")
     var subjectDescription by mutableStateOf("")
     var teacherId by mutableLongStateOf(0)
     var subjectIcon by mutableStateOf<ByteArray?>(null)
     var dayOfWeek by mutableIntStateOf(0)
+    var schedule: LiveData<List<SubjectData>> = _schedule
 
     fun onSubjectNameChanged(newName: String){
         subjectName = newName
@@ -57,6 +60,17 @@ class SubjectViewModel(
         val result = MutableLiveData<SubjectData>()
         viewModelScope.launch(Dispatchers.IO){
             result.postValue(appRepository.getSubject(subjectId))
+        }
+        return result
+    }
+
+    fun getSubjectsByDay(id: Int): LiveData<List<SubjectData>> {
+        val result = MutableLiveData<List<SubjectData>>()
+        viewModelScope.launch(Dispatchers.IO){
+            //result.postValue(appRepository.getTargets(subjectId))
+            appRepository.getSubjectByDay(id).collect{
+                _schedule.postValue(it)
+            }
         }
         return result
     }

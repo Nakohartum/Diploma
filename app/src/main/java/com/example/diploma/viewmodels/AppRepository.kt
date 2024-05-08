@@ -98,10 +98,13 @@ class AppRepository(
         return targetDao.getTargets(subjectId)
     }
 
-    fun getTargetsSecond(subjectId: Long): Flow<List<TargetData>> = targetDao.getTargets(subjectId)
 
     suspend fun deleteTarget(targetData: TargetData) {
         targetDao.deleteTarget(targetData)
+    }
+
+    fun getSubjectByDay(id: Int): Flow<List<SubjectData>> {
+        return subjectDataDao.getSubjectByDay(id)
     }
 
 }

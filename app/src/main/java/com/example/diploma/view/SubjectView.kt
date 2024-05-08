@@ -2,8 +2,10 @@ package com.example.diploma.view
 
 import android.Manifest
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
@@ -68,6 +70,44 @@ import com.example.diploma.viewmodels.Utils
 import java.util.Calendar
 
 
+@Composable
+fun ExactAlarmPermissionSetting() {
+    val context = LocalContext.current
+
+    Button(onClick = {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+        } else {
+            // Для Android ниже 12 (API 31), это действие не требуется
+            null
+        }
+        intent?.let { context.startActivity(it) }
+    }) {
+        Text("Allow Exact Alarm")
+    }
+}
+
+@Composable
+fun RequestNotificationPermission() {
+    // Context текущей Composable
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted: Boolean ->
+            if (isGranted) {
+
+            } else {
+
+            }
+        }
+    )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+}
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -80,12 +120,23 @@ fun SubjectView(
     controller: NavController,
     subjectId: Long
 ){
+
+
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {
+
+        }
+    )
+
+
     val subjectData = subjectViewModel.getSubject(subjectId).observeAsState()
     var showAddTarget by remember {
         mutableStateOf(false)
     }
 
-
+    //RequestNotificationPermission()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -230,8 +281,13 @@ fun SubjectView(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     onClick = {
-
                         showAddTarget = true
+                        Utils.checkAndRequestExactAlarmPermission(context)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                                permissionLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+                            }
+                        }
                     }
                 ) {
                     Text(text = "Add target")
@@ -264,7 +320,7 @@ fun AddTargetDialog(
     subjectData: SubjectData,
     onDismissClicked: () -> Unit
 ) {
-
+    val context = LocalContext.current
     var showDialog by remember {
         mutableStateOf(false)
     }
@@ -281,16 +337,17 @@ fun AddTargetDialog(
         },
         confirmButton = {
             Button(onClick = {
-
-                targetViewModel.addTarget(
-                    TargetData(
-                        targetName = targetViewModel.targetName,
-                        targetDescription = targetViewModel.targetDescription,
-                        isDone = false,
-                        subjectID = subjectData.subjectId,
-                        targetDeadline = targetViewModel.targetDeadline
-                    )
+                val target = TargetData(
+                    targetName = targetViewModel.targetName,
+                    targetDescription = targetViewModel.targetDescription,
+                    isDone = false,
+                    subjectID = subjectData.subjectId,
+                    targetDeadline = targetViewModel.targetDeadline
                 )
+                targetViewModel.addTarget(
+                    target
+                )
+                Utils.scheduleNotification(context = context, target)
                 onDismissClicked()
             }) {
                 Text(text = "Add")
