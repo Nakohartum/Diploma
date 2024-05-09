@@ -64,11 +64,11 @@ class SubjectViewModel(
         return result
     }
 
-    fun getSubjectsByDay(id: Int): LiveData<List<SubjectData>> {
+    fun getSubjectsByDay(id: Int, userId: Int): LiveData<List<SubjectData>> {
         val result = MutableLiveData<List<SubjectData>>()
         viewModelScope.launch(Dispatchers.IO){
             //result.postValue(appRepository.getTargets(subjectId))
-            appRepository.getSubjectByDay(id).collect{
+            appRepository.getSubjectByDay(id, userId).collect{
                 _schedule.postValue(it)
             }
         }

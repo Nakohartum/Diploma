@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.diploma.R
 import com.example.diploma.models.Screens
 import com.example.diploma.models.UserData
 import com.example.diploma.ui.theme.Orange
@@ -84,7 +86,7 @@ fun RegistrationView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome\nRegistration",
+            text = "${stringResource(id = R.string.welcome)}\n${stringResource(id = R.string.registration)}",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -94,28 +96,28 @@ fun RegistrationView(
             modifier = Modifier.padding(vertical = 4.dp),
             value = viewModel.userName,
             onValueChange = {viewModel.onUserNameChanged(it)},
-            label = {Text(text = "Name")},
+            label = {Text(text = stringResource(id = R.string.account_name))},
         )
 
         OutlinedTextField(
             modifier = Modifier.padding(vertical = 4.dp),
             value = viewModel.userSurname,
             onValueChange = {viewModel.onUserSurnameChanged(it)},
-            label = {Text(text = "Surname")},
+            label = {Text(text = stringResource(id = R.string.account_surname))},
         )
 
         OutlinedTextField(
             modifier = Modifier.padding(vertical = 4.dp),
             value = viewModel.userProfession,
             onValueChange = {viewModel.onUserProfessionChanged(it)},
-            label = {Text(text = "Profession")},
+            label = {Text(text = stringResource(id = R.string.account_profession))},
         )
 
         OutlinedTextField(
             modifier = Modifier.padding(vertical = 4.dp),
             value = viewModel.userCourse.toString(),
             onValueChange = {viewModel.onUserCourseChanged(it.toIntOrNull()?:0)},
-            label = {Text(text = "Course")},
+            label = {Text(text = stringResource(id = R.string.account_course))},
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
 
@@ -157,7 +159,7 @@ fun RegistrationView(
             },
         ) {
             Text(
-                text = "Register",
+                text = stringResource(id = R.string.register),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -176,12 +178,12 @@ fun EnterView(
         Row {
             Text(
                 modifier = Modifier.padding(8.dp),
-                text = "Accounts",
+                text = stringResource(id = R.string.accounts),
                 color = Color.White
             )
 
             Button(onClick = { controller.navigate(Screens.registrationScreen.route) }) {
-                Text(text = "Add")
+                Text(text = stringResource(id = R.string.add))
             }
         }
         LazyColumn(modifier = Modifier

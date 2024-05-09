@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.diploma.R
 import com.example.diploma.models.SubjectData
 import com.example.diploma.models.TargetData
 import com.example.diploma.ui.theme.DarkBlue
@@ -68,46 +70,6 @@ import com.example.diploma.viewmodels.TeacherViewModel
 import com.example.diploma.viewmodels.UserViewModel
 import com.example.diploma.viewmodels.Utils
 import java.util.Calendar
-
-
-@Composable
-fun ExactAlarmPermissionSetting() {
-    val context = LocalContext.current
-
-    Button(onClick = {
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-        } else {
-            // Для Android ниже 12 (API 31), это действие не требуется
-            null
-        }
-        intent?.let { context.startActivity(it) }
-    }) {
-        Text("Allow Exact Alarm")
-    }
-}
-
-@Composable
-fun RequestNotificationPermission() {
-    // Context текущей Composable
-    val context = LocalContext.current
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted: Boolean ->
-            if (isGranted) {
-
-            } else {
-
-            }
-        }
-    )
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
-
-}
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -136,7 +98,7 @@ fun SubjectView(
         mutableStateOf(false)
     }
 
-    //RequestNotificationPermission()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -156,7 +118,8 @@ fun SubjectView(
                    var scrollableState = rememberScrollState()
                    Column(
                        modifier = Modifier
-                           .fillMaxSize().verticalScroll(
+                           .fillMaxSize()
+                           .verticalScroll(
                                scrollableState
                            )
                    ) {
@@ -189,7 +152,7 @@ fun SubjectView(
                        Divider()
                        Text(
                            modifier = Modifier.fillMaxWidth(),
-                           text = "Teacher name: ${teacherData.value!!.teacherName}",
+                           text = "${stringResource(id = R.string.teachers_name)}: ${teacherData.value!!.teacherName}",
                            color = Color.White,
                            fontWeight = FontWeight.Bold,
                            fontSize = 15.sp,
@@ -197,7 +160,7 @@ fun SubjectView(
                        )
                        Text(
                            modifier = Modifier.fillMaxWidth(),
-                           text = "Teacher phone: ${teacherData.value!!.teachersPhone}",
+                           text = "${stringResource(id = R.string.teachers_phone)}: ${teacherData.value!!.teachersPhone}",
                            color = Color.White,
                            fontWeight = FontWeight.Bold,
                            fontSize = 15.sp,
@@ -205,7 +168,7 @@ fun SubjectView(
                        )
                        Text(
                            modifier = Modifier.fillMaxWidth(),
-                           text = "Teacher email: ${teacherData.value!!.teacherEmail}",
+                           text = "${stringResource(id = R.string.teachers_email)}: ${teacherData.value!!.teacherEmail}",
                            color = Color.White,
                            fontWeight = FontWeight.Bold,
                            fontSize = 15.sp,
@@ -293,7 +256,7 @@ fun SubjectView(
                         }
                     }
                 ) {
-                    Text(text = "Add target")
+                    Text(text = stringResource(id = R.string.add_target))
                 }
                 Button(
                     modifier = Modifier
@@ -303,7 +266,7 @@ fun SubjectView(
                         controller.popBackStack()
                     }
                 ) {
-                    Text(text = "Back")
+                    Text(text = stringResource(id = R.string.back))
                 }
 
                 if (showAddTarget){
@@ -327,12 +290,20 @@ fun AddTargetDialog(
     var showDialog by remember {
         mutableStateOf(false)
     }
+    var isShown by remember {
+        mutableStateOf(false)
+    }
     if (showDialog){
-        DatePicker(onDateSelected = {
-            targetViewModel.onTargetDeadlineChanged(it)
-            showDialog = false
-        }
-        )
+        DatePicker(isShown,
+            onDatePickerShown = {
+                                isShown = it
+            },
+            onDateSelected = {
+                targetViewModel.onTargetDeadlineChanged(it)
+                showDialog = false
+                isShown = false
+            }
+            )
     }
     AlertDialog(
         onDismissRequest = {
@@ -353,25 +324,25 @@ fun AddTargetDialog(
                 Utils.scheduleNotification(context = context, target)
                 onDismissClicked()
             }) {
-                Text(text = "Add")
+                Text(text = stringResource(id = R.string.add))
             }
         },
         dismissButton = {
             Button(onClick = {
                 onDismissClicked()
             }) {
-                Text(text = "Cancel")
+                Text(text = stringResource(id = R.string.cancel))
             }
         },
         text = {
             Column {
                 OutlinedTextField(
-                    label = { Text(text = "Target name")},
+                    label = { Text(text = stringResource(id = R.string.target_name))},
                     value = targetViewModel.targetName,
                     onValueChange = {targetViewModel.onTargetNameChanged(it)}
                 )
                 OutlinedTextField(
-                    label = { Text(text = "Target description")},
+                    label = { Text(text = stringResource(id = R.string.target_description))},
                     value = targetViewModel.targetDescription,
                     onValueChange = {targetViewModel.onTargetDescriptionChanged(it)}
                 )
@@ -385,7 +356,7 @@ fun AddTargetDialog(
 
 
 @Composable
-fun DatePicker(onDateSelected: (Long) -> Unit){
+fun DatePicker(isShown: Boolean, onDateSelected: (Long) -> Unit, onDatePickerShown: (Boolean) -> Unit){
         val context = LocalContext.current
         val calendar = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(context, {
@@ -397,7 +368,13 @@ fun DatePicker(onDateSelected: (Long) -> Unit){
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
-        datePickerDialog.show()
+        if (isShown){
+            return
+        }else{
+            datePickerDialog.show()
+            onDatePickerShown(true)
+        }
+
 }
 
 @Composable

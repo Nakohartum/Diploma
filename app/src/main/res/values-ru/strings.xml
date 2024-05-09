@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Диплом</string>
+    <string name="schedule">Расписание</string>
+    <string name="back_to_accounts">Назад в аккаунты</string>
+    <string name="account_info">Информация о аккаунте</string>
+    <string name="account_name">Имя</string>
+    <string name="account_surname">Фамилия</string>
+    <string name="account_profession">Специальность</string>
+    <string name="account_course">Курс</string>
+    <string name="add_teacher">Добавить учителя</string>
+    <string name="add_subject">Добавить предмет</string>
+    <string name="add">Добавить</string>
+    <string name="cancel">Отменить</string>
+    <string name="teachers_name">Имя учителя</string>
+    <string name="teachers_phone">Телефон учителя</string>
+    <string name="teachers_email">Почта учителя</string>
+    <string name="subject_name">Имя предмета</string>
+    <string name="subject_description">Описание предмета</string>
+    <string name="choose_teacher">Выбрать учителя</string>
+    <string name="select_day">Выбрать день</string>
+    <string name="hello">Привет</string>
+    <string name="continue_to">Продолжить</string>
+    <string name="all_lessons">Все предметы</string>
+    <string name="welcome">Добро пожаловать</string>
+    <string name="registration">Регистрация</string>
+    <string name="register">Зарегестрировать</string>
+    <string name="accounts">Аккаунты</string>
+    <string name="back">Назад</string>
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="add_target">Добавить цель</string>
+    <string name="target_name">Имя цели</string>
+    <string name="target_description">Описание цели</string>
+    <string name="deadline_reminder">Напоминание о дедлайне</string>
+</resources>

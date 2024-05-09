@@ -64,6 +64,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -118,7 +119,7 @@ fun AddDialog(
                     .clickable {
                         addTeacher = true
                     },
-                text = "Add teacher",
+                text = stringResource(id = R.string.add_teacher),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Blue,
@@ -131,7 +132,7 @@ fun AddDialog(
                     .clickable {
                         addSubject = true
                     },
-                text = "Add subject",
+                text = stringResource(id = R.string.add_subject),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Blue,
@@ -172,30 +173,30 @@ fun TeacherAdd(
                 viewModel.addTeacher(teacher)
                 onDismissClicked()
             }) {
-                Text(text = "Add")
+                Text(text = stringResource(id = R.string.add))
             }
         },
         dismissButton = {
             Button(onClick = {
                 onDismissClicked()
             }) {
-                Text(text = "Cancel")
+                Text(text = stringResource(id = R.string.cancel))
             }
         },
         text = {
             Column {
                 OutlinedTextField(
-                    label = { Text(text = "Teacher's name")},
+                    label = { Text(text = stringResource(id = R.string.teachers_name))},
                     value = viewModel.teacherName,
                     onValueChange = {viewModel.onTeacherNameChanged(it)}
                 )
                 OutlinedTextField(
-                    label = { Text(text = "Teacher's phone")},
+                    label = { Text(text = stringResource(id = R.string.teachers_phone))},
                     value = viewModel.teacherPhone,
                     onValueChange = {viewModel.onTeacherPhoneChanged(it)}
                 )
                 OutlinedTextField(
-                    label = { Text(text = "Teacher's email")},
+                    label = { Text(text = stringResource(id = R.string.teachers_email))},
                     value = viewModel.teacherEmail,
                     onValueChange = {viewModel.onTeacherEmailChanged(it)}
                 )
@@ -227,6 +228,21 @@ fun SubjectAdd(
     var chosenTeacher by remember {
         mutableStateOf<TeacherData?>(null)
     }
+
+    var daysStrings by remember {
+        mutableStateOf(listOf(
+            context.getString(R.string.monday),
+            context.getString(R.string.tuesday),
+            context.getString(R.string.wednesday),
+            context.getString(R.string.thursday),
+            context.getString(R.string.friday)
+        ))
+    }
+
+    var chosenDayString by remember {
+        mutableStateOf("")
+    }
+
     AlertDialog(
         onDismissRequest = {
             onDismissClicked()
@@ -246,20 +262,20 @@ fun SubjectAdd(
                 )
                 onDismissClicked()
             }) {
-                Text(text = "Add")
+                Text(text = stringResource(id = R.string.add))
             }
         },
         dismissButton = {
             Button(onClick = {
                 onDismissClicked()
             }) {
-                Text(text = "Cancel")
+                Text(text = stringResource(id = R.string.cancel))
             }
         },
         text = {
             Column {
                 OutlinedTextField(
-                    label = { Text(text = "Subject name")},
+                    label = { Text(text = stringResource(id = R.string.subject_name))},
                     value = subjectViewModel.subjectName,
                     onValueChange = {
                         if(it.length < 15){
@@ -268,7 +284,7 @@ fun SubjectAdd(
                     }
                 )
                 OutlinedTextField(
-                    label = { Text(text = "Subject description")},
+                    label = { Text(text = stringResource(id = R.string.subject_description))},
                     value = subjectViewModel.subjectDescription,
                     onValueChange = {subjectViewModel.onSubjectDescriptionChanged(it)}
                 )
@@ -276,7 +292,9 @@ fun SubjectAdd(
                     Button(onClick = {
                         teacherChoose = true
                     }) {
-                        Text(text = if (chosenTeacher != null) chosenTeacher!!.teacherName else "Choose teacher")
+                        Text(text = if (chosenTeacher != null) chosenTeacher!!.teacherName else stringResource(
+                            id = R.string.choose_teacher
+                        ))
                         DropdownMenu(expanded = teacherChoose, onDismissRequest = {
                             teacherChoose = false
                         }) {
@@ -296,19 +314,20 @@ fun SubjectAdd(
 
 
                     Button(onClick = { dayChoose = true }) {
-                        Text(text = if(chosenDay != null) chosenDay!!.dayName else "Select day")
+                        Text(text = if(chosenDay != null) chosenDayString  else stringResource(id = R.string.select_day))
                         DropdownMenu(expanded = dayChoose, onDismissRequest = {
                             dayChoose = false
                         }) {
 
-                            DaysOfTheWeek.entries.forEach{
+                            daysStrings.forEach{
                                 DropdownMenuItem(
                                     text = {
-                                        Text(text = it.dayName)
+                                        Text(text = "${it}")
                                     },
                                     onClick = {
-                                        chosenDay = it
-                                        subjectViewModel.onDayOfWeekChanged(it.id)
+                                        chosenDay = DaysOfTheWeek.entries.toTypedArray()[daysStrings.indexOf(it)]
+                                        chosenDayString = it
+                                        subjectViewModel.onDayOfWeekChanged(chosenDay!!.id)
                                         dayChoose = false
                                     })
                             }
@@ -425,7 +444,7 @@ fun TopBar(userData: UserData?){
     ) {
         Text(
             modifier = Modifier.padding(start = 8.dp),
-            text = "Hello ${userData?.userName}!",
+            text = "${stringResource(id = R.string.hello)} ${userData?.userName}!",
             fontSize = 25.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White
@@ -473,7 +492,7 @@ fun LastOpenedLesson(controller: NavController, subjectData: SubjectData?) {
             ) {
                 Text(
                     modifier = Modifier.padding(16.dp),
-                    text = "Continue to\n${subjectData?.subjectName}",
+                    text = "${stringResource(id = R.string.continue_to)}\n${subjectData?.subjectName}",
                     fontSize = 16.sp,
                     color = Color.White
                 )
@@ -500,7 +519,7 @@ fun AllLessonsView(controller: NavController, list: List<SubjectData>){
             modifier = Modifier
                 .wrapContentSize()
                 .padding(horizontal = 18.dp),
-            text = "All lessons",
+            text = stringResource(id = R.string.all_lessons),
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,

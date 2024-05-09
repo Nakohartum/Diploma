@@ -20,15 +20,23 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,12 +44,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.diploma.R
+import com.example.diploma.models.DaysOfTheWeek
 import com.example.diploma.models.Screens
 import com.example.diploma.models.UserData
 import com.example.diploma.ui.theme.DarkOrange
 import com.example.diploma.ui.theme.Orange
 import com.example.diploma.ui.theme.Pink
 import com.example.diploma.ui.theme.Purple
+import com.example.diploma.viewmodels.Utils
 
 
 @Composable
@@ -58,7 +68,7 @@ fun AccountView(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AccountTopView(userData)
+            AccountTopView(userData, controller)
             Divider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -69,7 +79,7 @@ fun AccountView(
             Button(onClick = {
                 controller.navigate(Screens.scheduleScreen.route)
             }) {
-                Text(text = "Schedule")
+                Text(text = stringResource(id = R.string.schedule))
             }
         }
         Button(
@@ -102,7 +112,7 @@ fun AccountView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 80.dp),
-                    text = "Back to Accounts",
+                    text = stringResource(id = R.string.back_to_accounts),
                     color = Color.White,
                 )
             }
@@ -111,27 +121,55 @@ fun AccountView(
 }
 
 @Composable
-fun AccountTopView(userData: UserData){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                Brush.horizontalGradient(
-                    0.0f to DarkOrange,
-                    0.8f to Orange
+fun AccountTopView(userData: UserData, navController: NavController) {
+    val context = LocalContext.current
+    Column {
+        var expanded by remember {
+            mutableStateOf(false)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.horizontalGradient(
+                        0.0f to DarkOrange,
+                        0.8f to Orange
+                    )
                 )
-            )
-            .height(220.dp),
-        contentAlignment = Alignment.Center
-    ){
-        if (userData.userPicture != null){
-            DisplayImage(modifier = Modifier
-                .width(150.dp)
-                .height(150.dp), image = userData.userPicture)
+                .height(220.dp),
+
+        ){
+            Button(onClick = { expanded = true }, modifier = Modifier.align(Alignment.TopEnd)) {
+                Text(text = Utils.loadLanguage(context))
+                DropdownMenu(expanded = expanded, onDismissRequest = {
+                    expanded = false
+                }) {
+
+                    DropdownMenuItem(
+                        text = { Text(text = "Русский") },
+                        onClick = {
+                            Utils.setLocale(context, "ru")
+                            expanded = false
+                            navController.navigate(Screens.chooseScreen.route)
+                        })
+                    DropdownMenuItem(
+                        text = { Text(text = "English") },
+                        onClick = {
+                            Utils.setLocale(context, "en")
+                            expanded = false
+                            navController.navigate(Screens.chooseScreen.route)
+                        })
+                }
+
+            }
+            if (userData.userPicture != null){
+                DisplayImage(modifier = Modifier
+                    .width(150.dp)
+                    .height(150.dp).align(Alignment.Center), image = userData.userPicture)
+            }
         }
     }
 }
-
 @Composable
 fun AccountDataView(userData: UserData){
     Column(
@@ -140,28 +178,28 @@ fun AccountDataView(userData: UserData){
             .padding(start = 16.dp, top = 16.dp),
     ) {
         Text(
-            text = "Account Info",
+            text = stringResource(id = R.string.account_info),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp,
             color = Color.White
         )
         DataView(
-            title = "Name",
+            title = stringResource(id = R.string.account_name),
             icon = R.drawable.icons8_person_96,
             data = userData.userName!!
         )
         DataView(
-            title = "Surname",
+            title = stringResource(id = R.string.account_surname),
             icon = R.drawable.icons8_person_96__1_,
             data = userData.userSurname!!
         )
         DataView(
-            title = "Profession",
+            title = stringResource(id = R.string.account_profession),
             icon = R.drawable.icons8_new_job_96,
             data = userData.userProfession
         )
         DataView(
-            title = "Course",
+            title = stringResource(id = R.string.account_course),
             icon = R.drawable.icons8_university_96,
             data = userData.userCourse.toString()
         )

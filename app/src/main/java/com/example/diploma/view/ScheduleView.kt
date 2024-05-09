@@ -32,22 +32,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.diploma.R
 import com.example.diploma.models.DaysOfTheWeek
 import com.example.diploma.models.Screens
 import com.example.diploma.models.SubjectData
 import com.example.diploma.models.TeacherData
 import com.example.diploma.viewmodels.SubjectViewModel
 import com.example.diploma.viewmodels.TeacherViewModel
+import com.example.diploma.viewmodels.UserViewModel
 
 @Composable
 fun ScheduleView(
     navController: NavController,
+    userViewModel: UserViewModel,
     subjectViewModel: SubjectViewModel,
     teacherViewModel: TeacherViewModel
 ){
@@ -62,9 +66,21 @@ fun ScheduleView(
     var currentDay by remember {
         mutableStateOf(daysOfTheWeek[index])
     }
-    subjectViewModel.getSubjectsByDay(currentDay.id)
+    subjectViewModel.getSubjectsByDay(currentDay.id, userViewModel.userData!!.userId.toInt())
     val targetsList by subjectViewModel.schedule.observeAsState(listOf())
 
+    var currentDayString by remember {
+        mutableStateOf("")
+    }
+
+    currentDayString = when(currentDay.dayName){
+        "Monday" -> stringResource(id = R.string.monday)
+        "Tuesday" -> stringResource(id = R.string.tuesday)
+        "Wednesday" -> stringResource(id = R.string.wednesday)
+        "Thursday" -> stringResource(id = R.string.thursday)
+        "Friday" -> stringResource(id = R.string.friday)
+        else -> ""
+    }
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -92,7 +108,7 @@ fun ScheduleView(
 
                 Text(
                     fontSize = 25.sp,
-                    text = currentDay.dayName,
+                    text = currentDayString,
                     color = Color.White
                 )
 
@@ -131,7 +147,7 @@ fun ScheduleView(
                     navController.popBackStack()
                 }
             ) {
-                Text(text = "Back")
+                Text(text = stringResource(id = R.string.back))
             }
         }
 
@@ -166,5 +182,5 @@ fun ItemView(subjectData: SubjectData, teacherData: TeacherData, navController: 
 @Preview(showBackground = true)
 @Composable
 fun ScheduleViewPreview(){
-    ScheduleView(navController = rememberNavController(), viewModel(), viewModel())
+    ScheduleView(navController = rememberNavController(), viewModel(), viewModel(), viewModel())
 }

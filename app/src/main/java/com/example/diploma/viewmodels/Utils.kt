@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -15,6 +16,8 @@ import java.util.Date
 import java.util.Locale
 
 object Utils {
+    private const val PREFERENCES_FILE_KEY = "com.example.settings"
+    private const val LANGUAGE_KEY = "language"
     fun formatDate(milliseconds: Long?): String {
         if (milliseconds == null) return "No deadline set"
         val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -80,4 +83,35 @@ object Utils {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(pendingIntent)
     }
+
+    fun saveLanguage(context: Context, languageCode: String) {
+        val sharedPreferences = context.getSharedPreferences(PREFERENCES_FILE_KEY, Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putString(LANGUAGE_KEY, languageCode)
+            apply()
+        }
+    }
+
+    fun loadLanguage(context: Context): String {
+        val sharedPreferences = context.getSharedPreferences(PREFERENCES_FILE_KEY, Context.MODE_PRIVATE)
+        return sharedPreferences.getString(LANGUAGE_KEY, Locale.getDefault().language) ?: Locale.getDefault().language
+    }
+
+    fun setLocale(context: Context, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        context.createConfigurationContext(config)
+
+        // Сохраняем выбранный язык
+        saveLanguage(context, languageCode)
+    }
+
+    fun applySavedLocale(context: Context) {
+        val languageCode = loadLanguage(context)
+        setLocale(context, languageCode)
+    }
+
 }

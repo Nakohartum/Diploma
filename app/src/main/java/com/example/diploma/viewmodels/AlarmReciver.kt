@@ -21,7 +21,7 @@ class AlarmReceiver : BroadcastReceiver() {
         createNotificationChannel(context)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.baseline_home_24)
-            .setContentTitle("Deadline Reminder")
+            .setContentTitle(context.getString(R.string.deadline_reminder))
             .setContentText(targetDescription)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)

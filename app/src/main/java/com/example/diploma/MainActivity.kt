@@ -18,11 +18,13 @@ import com.example.diploma.viewmodels.SubjectViewModel
 import com.example.diploma.viewmodels.TargetViewModel
 import com.example.diploma.viewmodels.TeacherViewModel
 import com.example.diploma.viewmodels.UserViewModel
+import com.example.diploma.viewmodels.Utils
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            Utils.applySavedLocale(this)
             val navController = rememberNavController()
             val viewModel: UserViewModel = viewModel()
             val teacherViewModel: TeacherViewModel = viewModel()
@@ -34,6 +36,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+
                     MainView(viewModel, navController,teacherViewModel, targetViewModel, subjectViewModel)
 
                 }

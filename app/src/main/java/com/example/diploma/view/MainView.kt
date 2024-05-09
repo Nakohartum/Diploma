@@ -109,7 +109,8 @@ fun Navigation(
             ScheduleView(
                 navController = navController,
                 teacherViewModel = teacherViewModel,
-                subjectViewModel = subjectViewModel
+                subjectViewModel = subjectViewModel,
+                userViewModel = viewModel
             )
         }
 

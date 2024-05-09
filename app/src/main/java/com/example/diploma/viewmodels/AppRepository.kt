@@ -103,8 +103,8 @@ class AppRepository(
         targetDao.deleteTarget(targetData)
     }
 
-    fun getSubjectByDay(id: Int): Flow<List<SubjectData>> {
-        return subjectDataDao.getSubjectByDay(id)
+    fun getSubjectByDay(id: Int, userId: Int): Flow<List<SubjectData>> {
+        return subjectDataDao.getSubjectByDay(id, userId)
     }
 
 }

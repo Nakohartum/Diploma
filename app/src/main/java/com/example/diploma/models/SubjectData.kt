@@ -59,8 +59,8 @@ interface SubjectDataDao{
     abstract fun getSubjectsFromUser(userId: Long): List<SubjectData>
     @Query("SELECT * FROM subjects WHERE subjectId = :subjectId")
     abstract fun getSubject(subjectId: Long): SubjectData?
-    @Query("SELECT * FROM subjects WHERE subject_day = :id")
-    abstract fun getSubjectByDay(id: Int): Flow<List<SubjectData>>
+    @Query("SELECT * FROM subjects WHERE subject_day = :id and userId = :userId")
+    abstract fun getSubjectByDay(id: Int, userId: Int): Flow<List<SubjectData>>
 }
 
 @Dao
