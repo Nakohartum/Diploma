@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.diploma.models.SubjectData
+import com.example.diploma.models.TargetData
 import com.example.diploma.models.TeacherData
 import com.example.diploma.models.UserData
 import kotlinx.coroutines.Dispatchers
@@ -22,12 +23,24 @@ class UserViewModel(
     private val appRepository: AppRepository = Graph.appRepository,
 
 ): ViewModel() {
+    private var _subjects = MutableLiveData<List<SubjectData>>()
+    private var _lastSubject = MutableLiveData<SubjectData?>()
     var userData by mutableStateOf<UserData?>(null)
     var userName by mutableStateOf("")
     var userSurname by mutableStateOf("")
     var userProfession by mutableStateOf("")
     var userCourse by mutableIntStateOf(0)
-    var userPicture by mutableStateOf<ByteArray?>(null)
+    var userPicture by mutableStateOf<String?>(null)
+    var subjects = _subjects
+    var lastSubject = _lastSubject
+
+    fun clearStates(){
+        userName = ""
+        userSurname = ""
+        userProfession = ""
+        userCourse = 0
+        userPicture = null
+    }
 
     fun onUserNameChanged(newName: String){
         userName = newName
@@ -41,7 +54,7 @@ class UserViewModel(
     fun onUserCourseChanged(newCourse: Int){
         userCourse = newCourse
     }
-    fun onUserPictureChanged(newPicture: ByteArray){
+    fun onUserPictureChanged(newPicture: String){
         userPicture = newPicture
     }
 
@@ -68,9 +81,18 @@ class UserViewModel(
     }
 
     fun getAllSubjects(): LiveData<List<SubjectData>> {
+//        val result = MutableLiveData<List<SubjectData>>()
+//        viewModelScope.launch(Dispatchers.IO){
+//            result.postValue(appRepository.getSubjectsFromUser(userData!!.userId))
+//        }
+//        return result
+
         val result = MutableLiveData<List<SubjectData>>()
         viewModelScope.launch(Dispatchers.IO){
-            result.postValue(appRepository.getSubjectsFromUser(userData!!.userId))
+            //result.postValue(appRepository.getTargets(subjectId))
+            appRepository.getSubjectsFromUser(userData!!.userId).collect{
+                _subjects.postValue(it)
+            }
         }
         return result
     }
@@ -84,9 +106,15 @@ class UserViewModel(
     }
 
     fun getLastSubject(): LiveData<SubjectData> {
+//        val result = MutableLiveData<SubjectData>()
+//        viewModelScope.launch(Dispatchers.IO){
+//            result.postValue(appRepository.getLastOpened(userData!!.userId))
+//        }
+//        return result
         val result = MutableLiveData<SubjectData>()
         viewModelScope.launch(Dispatchers.IO){
-            result.postValue(appRepository.getLastOpened(userData!!.userId))
+            //result.postValue(appRepository.getTargets(subjectId))
+            _lastSubject.postValue(appRepository.getLastOpened(userData!!.userId))
         }
         return result
     }

@@ -165,7 +165,8 @@ fun AccountTopView(userData: UserData, navController: NavController) {
             if (userData.userPicture != null){
                 DisplayImage(modifier = Modifier
                     .width(150.dp)
-                    .height(150.dp).align(Alignment.Center), image = userData.userPicture)
+                    .height(150.dp)
+                    .align(Alignment.Center), image = userData.userPicture)
             }
         }
     }
@@ -244,5 +245,5 @@ fun DataView(
 @Preview(showBackground = true)
 @Composable
 fun AppPreview(){
-
+    AccountView(userData = UserData(1, "1","1","1",1,"sds"), controller = rememberNavController())
 }

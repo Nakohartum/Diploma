@@ -23,9 +23,17 @@ class SubjectViewModel(
     var subjectName by mutableStateOf("")
     var subjectDescription by mutableStateOf("")
     var teacherId by mutableLongStateOf(0)
-    var subjectIcon by mutableStateOf<ByteArray?>(null)
+    var subjectIcon by mutableStateOf<String?>(null)
     var dayOfWeek by mutableIntStateOf(0)
     var schedule: LiveData<List<SubjectData>> = _schedule
+
+    fun clearStates(){
+        subjectName = ""
+        subjectDescription = ""
+        teacherId = 0
+        subjectIcon = null
+        dayOfWeek = 0
+    }
 
     fun onSubjectNameChanged(newName: String){
         subjectName = newName
@@ -39,7 +47,7 @@ class SubjectViewModel(
         teacherId = newId
     }
 
-    fun onSubjectIconChanged(newIcon: ByteArray){
+    fun onSubjectIconChanged(newIcon: String){
         subjectIcon = newIcon
     }
 
@@ -73,6 +81,12 @@ class SubjectViewModel(
             }
         }
         return result
+    }
+
+    fun deleteSubject(subjectData: SubjectData) {
+        viewModelScope.launch(Dispatchers.IO){
+            appRepository.deleteSubject(subjectData)
+        }
     }
 
 

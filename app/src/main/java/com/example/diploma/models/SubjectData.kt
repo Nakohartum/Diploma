@@ -23,7 +23,7 @@ data class SubjectData(
     @ColumnInfo("subject_name") val subjectName: String,
     @ColumnInfo("subject_description") val subjectDescription: String,
     @ColumnInfo("teacherId") val teacherID: Long,
-    @ColumnInfo("subject_icon") val subjectIcon: ByteArray?,
+    @ColumnInfo("subject_icon") val subjectIcon: String?,
     @ColumnInfo("subject_day") val dayOfWeek: Int,
     @ColumnInfo("userId") val userId: Long,
     @ColumnInfo("last_opened_time") val lastOpenedTime: Long
@@ -56,7 +56,7 @@ interface SubjectDataDao{
     @Query("UPDATE subjects SET last_opened_time = :timestamp WHERE subjectId = :subjectId AND userId = :userId")
     abstract fun updateLastOpenedLesson(subjectId: Long, userId: Long, timestamp: Long)
     @Query("SELECT * FROM subjects WHERE userId = :userId")
-    abstract fun getSubjectsFromUser(userId: Long): List<SubjectData>
+    abstract fun getSubjectsFromUser(userId: Long): Flow<List<SubjectData>>
     @Query("SELECT * FROM subjects WHERE subjectId = :subjectId")
     abstract fun getSubject(subjectId: Long): SubjectData?
     @Query("SELECT * FROM subjects WHERE subject_day = :id and userId = :userId")

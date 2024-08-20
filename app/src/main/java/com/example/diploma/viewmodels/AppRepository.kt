@@ -62,7 +62,7 @@ class AppRepository(
         subjectDataDao.updateLastOpenedLesson(subjectId, userId, timestamp)
     }
 
-    suspend fun getSubjectsFromUser(userId: Long): List<SubjectData>{
+    suspend fun getSubjectsFromUser(userId: Long): Flow<List<SubjectData>>{
         return subjectDataDao.getSubjectsFromUser(userId)
     }
 
@@ -105,6 +105,10 @@ class AppRepository(
 
     fun getSubjectByDay(id: Int, userId: Int): Flow<List<SubjectData>> {
         return subjectDataDao.getSubjectByDay(id, userId)
+    }
+
+    fun deleteSubject(subjectData: SubjectData) {
+        subjectDataDao.deleteSubject(subjectData)
     }
 
 }

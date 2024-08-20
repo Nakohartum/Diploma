@@ -21,7 +21,7 @@ data class UserData(
     @ColumnInfo(name = "user_surname") val userSurname: String?,
     @ColumnInfo(name = "user_prof") val userProfession: String,
     @ColumnInfo(name = "user_course") val userCourse: Int,
-    @ColumnInfo(name = "user_picture") val userPicture: ByteArray?,
+    @ColumnInfo(name = "user_picture") val userPicture: String?,
 )
 
 @Dao

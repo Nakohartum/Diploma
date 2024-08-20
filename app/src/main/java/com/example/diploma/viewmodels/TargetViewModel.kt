@@ -26,6 +26,13 @@ class TargetViewModel(
     var targetDeadline by mutableLongStateOf(0L)
     var isDone by mutableStateOf(false)
     var targets: LiveData<List<TargetData>> = _targets
+
+    fun clearStates(){
+        targetName = ""
+        targetDescription = ""
+        targetDeadline = 0L
+    }
+
     fun onTargetNameChanged(newName: String){
         targetName = newName
     }

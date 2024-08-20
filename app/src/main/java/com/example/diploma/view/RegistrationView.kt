@@ -28,8 +28,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -97,6 +99,7 @@ fun RegistrationView(
             value = viewModel.userName,
             onValueChange = {viewModel.onUserNameChanged(it)},
             label = {Text(text = stringResource(id = R.string.account_name))},
+            colors = OutlinedTextFieldDefaults.colors(unfocusedTextColor = Color.Black, focusedTextColor = Color.Black)
         )
 
         OutlinedTextField(
@@ -104,6 +107,7 @@ fun RegistrationView(
             value = viewModel.userSurname,
             onValueChange = {viewModel.onUserSurnameChanged(it)},
             label = {Text(text = stringResource(id = R.string.account_surname))},
+            colors = OutlinedTextFieldDefaults.colors(unfocusedTextColor = Color.Black, focusedTextColor = Color.Black)
         )
 
         OutlinedTextField(
@@ -111,6 +115,7 @@ fun RegistrationView(
             value = viewModel.userProfession,
             onValueChange = {viewModel.onUserProfessionChanged(it)},
             label = {Text(text = stringResource(id = R.string.account_profession))},
+            colors = OutlinedTextFieldDefaults.colors(unfocusedTextColor = Color.Black, focusedTextColor = Color.Black)
         )
 
         OutlinedTextField(
@@ -119,6 +124,7 @@ fun RegistrationView(
             onValueChange = {viewModel.onUserCourseChanged(it.toIntOrNull()?:0)},
             label = {Text(text = stringResource(id = R.string.account_course))},
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = OutlinedTextFieldDefaults.colors(unfocusedTextColor = Color.Black, focusedTextColor = Color.Black)
         )
 
         Row(
@@ -128,8 +134,9 @@ fun RegistrationView(
             horizontalArrangement = Arrangement.SpaceEvenly
         ){
             ImagePicker(onImagePicked = {
-                val imageData = Utils.uriToByteArray(context, it)
-                viewModel.onUserPictureChanged(imageData!!)
+                //val imageData = Utils.uriToByteArray(context, it)
+                val imagePath = Utils.copyUriToFile(context, it, "image_${System.currentTimeMillis()}")
+                viewModel.onUserPictureChanged(imagePath!!)
             })
         }
 
@@ -155,6 +162,7 @@ fun RegistrationView(
                     userPicture = viewModel.userPicture
                 )
                 viewModel.addUser(userData)
+                viewModel.clearStates()
                 navController.navigate(Screens.chooseScreen.route)
             },
         ) {
@@ -217,7 +225,7 @@ fun AccountCard(
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)) {
-            Text(text = userData.userName!!)
+            Text(text = userData.userName!!, color = Color.Black)
         }
     }
 }

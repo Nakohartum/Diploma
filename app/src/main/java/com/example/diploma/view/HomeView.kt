@@ -1,8 +1,6 @@
 package com.example.diploma.view
 
 
-import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,56 +20,44 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.DismissValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.rememberDismissState
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberImagePainter
-import com.example.diploma.MainActivity
 import com.example.diploma.R
 import com.example.diploma.models.DaysOfTheWeek
 import com.example.diploma.models.Screens
@@ -86,7 +71,6 @@ import com.example.diploma.viewmodels.SubjectViewModel
 import com.example.diploma.viewmodels.TeacherViewModel
 import com.example.diploma.viewmodels.UserViewModel
 import com.example.diploma.viewmodels.Utils
-import kotlinx.coroutines.flow.toList
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -171,6 +155,7 @@ fun TeacherAdd(
                     userId = userViewModel.userData!!.userId
                 )
                 viewModel.addTeacher(teacher)
+                viewModel.clearStates()
                 onDismissClicked()
             }) {
                 Text(text = stringResource(id = R.string.add))
@@ -260,6 +245,8 @@ fun SubjectAdd(
                         lastOpenedTime = System.currentTimeMillis()
                     )
                 )
+                subjectViewModel.clearStates()
+                userViewModel.getLastSubject()
                 onDismissClicked()
             }) {
                 Text(text = stringResource(id = R.string.add))
@@ -336,8 +323,9 @@ fun SubjectAdd(
                 }
 
                 ImagePicker(onImagePicked = {
-                    val imageData = Utils.uriToByteArray(context, it)
-                    subjectViewModel.onSubjectIconChanged(imageData!!)
+                    //val imageData = Utils.uriToByteArray(context, it)
+                    val imagePath = Utils.copyUriToFile(context, it, "image_${System.currentTimeMillis()}")
+                    subjectViewModel.onSubjectIconChanged(imagePath!!)
                 })
             }
         }
@@ -370,7 +358,7 @@ fun HomeView(
     subjectViewModel: SubjectViewModel,
     paddingValues: PaddingValues
 ){
-    val listOfSubject = viewModel.getAllSubjects().observeAsState(listOf())
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -380,8 +368,7 @@ fun HomeView(
         ContentView(
             controller,
             viewModel,
-            subjectViewModel,
-            if (listOfSubject.value.isNotEmpty()) listOfSubject.value else listOf()
+            subjectViewModel
         )
     }
 }
@@ -456,18 +443,19 @@ fun TopBar(userData: UserData?){
 fun ContentView(
     controller: NavController,
     userViewModel: UserViewModel,
-    subjectViewModel: SubjectViewModel,
-    list: List<SubjectData>
+    subjectViewModel: SubjectViewModel
 ) {
-    val lastOpenedLesson = userViewModel.getLastSubject().observeAsState(null)
+    userViewModel.getLastSubject()
+    val lastOpenedLesson by userViewModel.lastSubject.observeAsState(initial = null)
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (lastOpenedLesson.value != null){
-            LastOpenedLesson(controller = controller, subjectData = lastOpenedLesson.value)
+        if (lastOpenedLesson != null){
+            LastOpenedLesson(controller = controller, subjectData = lastOpenedLesson)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        AllLessonsView(controller, list)
+        AllLessonsView(controller, userViewModel, subjectViewModel)
     }
 }
 
@@ -509,7 +497,9 @@ fun LastOpenedLesson(controller: NavController, subjectData: SubjectData?) {
 
 
 @Composable
-fun AllLessonsView(controller: NavController, list: List<SubjectData>){
+fun AllLessonsView(controller: NavController, userViewModel: UserViewModel, subjectViewModel: SubjectViewModel){
+    userViewModel.getAllSubjects()
+    val listOfSubject = userViewModel.subjects.observeAsState(listOf())
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -530,14 +520,14 @@ fun AllLessonsView(controller: NavController, list: List<SubjectData>){
         modifier = Modifier.height(400.dp),
         verticalArrangement = Arrangement.Top
     ){
-        items(list){
-            LessonView(controller = controller, subjectData = it)
+        items(listOfSubject.value){
+            LessonView(controller = controller, subjectData = it, subjectViewModel = subjectViewModel, userViewModel)
         }
     }
 }
 
 @Composable
-fun LessonView(controller: NavController, subjectData: SubjectData) {
+fun LessonView(controller: NavController, subjectData: SubjectData, subjectViewModel: SubjectViewModel, userViewModel: UserViewModel) {
     Box(
         modifier = Modifier
             .width(200.dp)
@@ -553,16 +543,26 @@ fun LessonView(controller: NavController, subjectData: SubjectData) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (subjectData.subjectIcon != null){
-                DisplayImage(
-                    modifier = Modifier.width(120.dp),
-                    image = subjectData.subjectIcon
-                )
+            Row {
+                if (subjectData.subjectIcon != null){
+                    DisplayImage(
+                        modifier = Modifier.width(120.dp),
+                        image = subjectData.subjectIcon
+                    )
+                }
+                IconButton(modifier = Modifier.padding(start = 4.dp), onClick = {
+                    subjectViewModel.deleteSubject(subjectData)
+                    userViewModel.getLastSubject()
+                    controller.navigate(Screens.homeScreen.route)
+                }) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = null, tint = Color.White)
+                }
             }
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
+                textAlign = TextAlign.Center,
                 text = subjectData.subjectName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -574,8 +574,8 @@ fun LessonView(controller: NavController, subjectData: SubjectData) {
 
 
 @Composable
-fun DisplayImage(modifier: Modifier, image: ByteArray?) {
-    val imageBitmap = BitmapFactory.decodeByteArray(image, 0, image!!.size)
+fun DisplayImage(modifier: Modifier, image: String?) {
+    val imageBitmap = BitmapFactory.decodeFile(image)
     Image(
         modifier = modifier,
         bitmap = imageBitmap.asImageBitmap(),

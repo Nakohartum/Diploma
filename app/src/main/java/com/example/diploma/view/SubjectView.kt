@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -108,7 +109,7 @@ fun SubjectView(
         Box(modifier = Modifier
             .padding(4.dp)
             .weight(0.9f)
-            .background(DarkOrange, RoundedCornerShape(4.dp))){
+            .background(colorResource(id = R.color.light_red), RoundedCornerShape(4.dp))){
            if (subjectData.value != null){
                val teacherData = teacherViewModel.getTeacher(subjectData.value!!.teacherID).observeAsState()
                targetViewModel.getTargets(subjectData.value!!.subjectId)
@@ -124,13 +125,14 @@ fun SubjectView(
                            )
                    ) {
                        Row(
-                           modifier = Modifier.padding(4.dp),
+                           modifier = Modifier.padding(8.dp),
                            verticalAlignment = Alignment.CenterVertically
                        ) {
                            if (subjectData.value!!.subjectIcon != null){
                                DisplayImage(modifier = Modifier
                                    .width(100.dp)
-                                   .height(100.dp), image = subjectData.value!!.subjectIcon)
+                                   .height(100.dp)
+                                   , image = subjectData.value!!.subjectIcon)
                            }
                            Text(
                                modifier = Modifier.fillMaxWidth(),
@@ -321,6 +323,7 @@ fun AddTargetDialog(
                 targetViewModel.addTarget(
                     target
                 )
+                targetViewModel.clearStates()
                 Utils.scheduleNotification(context = context, target)
                 onDismissClicked()
             }) {

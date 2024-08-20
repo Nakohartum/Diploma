@@ -5,12 +5,19 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.ui.graphics.Color
 import com.example.diploma.models.TargetData
 import com.example.diploma.ui.theme.DarkOrange
+import com.example.diploma.ui.theme.LightBlue
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,8 +37,8 @@ object Utils {
         val timeDifference = deadline - currentTime
         return when {
             timeDifference <= 0 -> Color.Red
-            timeDifference <= 24 * 60 * 60 * 1000 -> Color.Magenta
-            else -> DarkOrange
+            timeDifference <= 24 * 60 * 60 * 1000 -> Color.Red
+            else -> LightBlue
         }
     }
 
@@ -112,6 +119,42 @@ object Utils {
     fun applySavedLocale(context: Context) {
         val languageCode = loadLanguage(context)
         setLocale(context, languageCode)
+    }
+
+    fun saveBitmapToFile(context: Context, bitmap: Bitmap, filename: String): String? {
+        val directory = context.filesDir
+        val file = File(directory, "$filename.png")
+
+        return try {
+            val outputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+            file.absolutePath
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun copyUriToFile(context: Context, uri: Uri, filename: String): String? {
+        val directory = context.filesDir
+        val file = File(directory, filename)
+
+        return try {
+            val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+            val outputStream: OutputStream = FileOutputStream(file)
+
+            inputStream?.copyTo(outputStream)
+
+            inputStream?.close()
+            outputStream.close()
+
+            file.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
 }

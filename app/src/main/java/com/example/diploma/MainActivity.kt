@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
             val teacherViewModel: TeacherViewModel = viewModel()
             val subjectViewModel: SubjectViewModel = viewModel()
             val targetViewModel: TargetViewModel = viewModel()
-            DiplomaTheme {
+            DiplomaTheme(darkTheme = false) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

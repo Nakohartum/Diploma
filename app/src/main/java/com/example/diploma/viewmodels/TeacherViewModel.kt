@@ -15,10 +15,15 @@ import kotlinx.coroutines.launch
 class TeacherViewModel(
     private val appRepository: AppRepository = Graph.appRepository
 ): ViewModel() {
-
     var teacherName by mutableStateOf("")
     var teacherPhone by mutableStateOf("")
     var teacherEmail by mutableStateOf("")
+
+    fun clearStates(){
+        teacherName = ""
+        teacherPhone = ""
+        teacherEmail = ""
+    }
 
     fun onTeacherNameChanged(newName: String){
         teacherName = newName
